@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,11 +7,133 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String  
+model Admin_account {
+  id            Int                 @id @default(autoincrement())
+  username      String?             @db.VarChar(100)
+  password      String?             @db.VarChar(100)
+  full_name     String?             @db.VarChar(100)
+  role          admin_account_role? @default(kasir)
+  orders        Orders[]
+  website_order Website_order[]
+
+  @@map("admin_account")
 }
 
+model Basket {
+  id            Int         @id @default(autoincrement())
+  order_type_id Int?
+  order_type    Order_type? @relation(fields: [order_type_id], references: [id])
+  orders        Orders[]
+  
+  @@index([order_type_id])
+  @@map("basket")
+}
+
+model Drinks {
+  id    Int      @id @default(autoincrement())
+  name  String?  @db.VarChar(100)
+  price Decimal? @db.Decimal(10, 2)
+
+  @@map("drinks")
+}
+
+model Foods {
+  id    Int      @id @default(autoincrement())
+  name  String?  @db.VarChar(100)
+  price Decimal? @db.Decimal(10, 2)
+
+  @@map("foods")
+}
+
+model Kitchen {
+  id         Int             @id @default(autoincrement())
+  order_id   Int
+  status     kitchen_status? @default(waiting)
+  updated_at DateTime        @default(now()) @db.Timestamp(0)
+  orders     Orders          @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "kitchen_order_fk")
+
+  @@index([order_id], map: "order_id")
+  @@map("kitchen")
+}
+
+model Order_type {
+  id      Int     @id @default(autoincrement())
+  name    String
+  baskets Basket[]
+  
+  @@map("order_type")
+}
+
+model Orders {
+  id       Int    @id @default(autoincrement())
+  basket_id Int?
+  menu_id   Int?
+  qty      Int
+  total    Int
+  basket   Basket? @relation(fields: [basket_id], references: [id])
+  menu     Menu?   @relation(fields: [menu_id], references: [id])
+  
+  @@index([basket_id])
+  @@index([menu_id])
+  @@map("orders")
+  Kitchen Kitchen[] @relation(map: "kitchen_order_fk")
+  Admin_account Admin_account[]
+  Website_order Website_order[] @relation(map: "website_order_ibfk_1")
+}
+
+model Website_order {
+  id            Int            @id @default(autoincrement())
+  table_number  String?        @db.VarChar(10)
+  order_id      Int?
+  admin_id      Int?
+  created_at    DateTime       @default(now()) @db.Timestamp(0)
+  menu_id       Int?
+  menu          Menu?          @relation(fields: [menu_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_menu_id")
+  orders        Orders?        @relation(fields: [order_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "website_order_ibfk_1")
+  admin_account Admin_account? @relation(fields: [admin_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "website_order_ibfk_2")
+
+  @@index([admin_id], map: "admin_id")
+  @@index([order_id], map: "order_id")
+  @@index([menu_id], map: "fk_menu_id")
+  @@map("website_order")
+}
+
+model Menu {
+  id       Int     @id @default(autoincrement())
+  nama     String
+  harga    Int
+  kategori String
+  orders   Orders[]
+  
+  @@map("menu")
+  Website_order Website_order[] @relation(map: "fk_menu_id")
+}
+
+model snacks {
+  id    Int      @id @default(autoincrement())
+  name  String?  @db.VarChar(100)
+  price Decimal? @db.Decimal(10, 2)
+}
+
+enum order_type_type_name {
+  take_away
+  dine_in
+}
+
+enum kitchen_status {
+  waiting
+  preparing
+  done
+}
+
+enum admin_account_role {
+  admin
+  kasir
+  dapur
+}
+
+enum menu_kategori {
+  foods
+  drinks
+  snacks
+}

@@ -6,7 +6,10 @@ const nextConfig = {
                 hostname: 'placehold.co'
             }
         ]
-    }
+    },
+    experimental: {
+        serverComponentsExternalPackages: ['jsonwebtoken'],
+    },
 };
 
 export default nextConfig;

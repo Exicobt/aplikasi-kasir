@@ -36,13 +36,14 @@ const Menu = () => {
   const deleteMenu = (item) => {
     setIsLoading(true);
     const fetchDelete = async () => {
-      fetch("/api/menu", {
+      await fetch("/api/menu", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           menu_id: item.id,
+          action: 'delete'
         }),
       });
     };
@@ -52,13 +53,13 @@ const Menu = () => {
           Yakin hapus data ini?
           <div className="mt-2 flex gap-2">
             <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                fetchDelete();
-                fetchMenu();
-                toast.success(`Berhasil menghapus ${item.nama}`);
-                setIsLoading(false);
-              }}
+              onClick={async () => {
+              toast.dismiss(t.id);
+              await fetchDelete();
+              await fetchMenu();
+              toast.success(`Berhasil menghapus ${item.nama}`);
+              setIsLoading(false);
+            }}
               className="bg-red-500 text-white px-3 py-1 rounded"
             >
               Ya

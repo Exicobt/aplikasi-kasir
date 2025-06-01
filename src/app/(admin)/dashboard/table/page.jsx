@@ -12,6 +12,7 @@ import {
   TableCell,
 } from "../components/Table";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const TablePage = () => {
   const [activeTab, setActiveTab] = useState("tables");
@@ -34,19 +35,49 @@ const TablePage = () => {
         });
     };
 
-  const handleDelete = async(data) => {
-    await fetch("/api/table", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            action: 'delete',
-            table_id: data.id
-        })
-    })
-    fetchTable()
-  }
+  const handleDelete = (item) => {
+      const fetchDelete = async () => {
+        await fetch("/api/table", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            table_id: item.id,
+            action: 'delete'
+          }),
+        });
+      };
+      toast(
+        (t) => (
+          <span>
+            Yakin hapus data ini?
+            <div className="mt-2 flex gap-2">
+              <button
+                onClick={async () => {
+                toast.dismiss(t.id);
+                await fetchDelete();
+                await fetchTable();
+                toast.success(`Berhasil menghapus meja ${item.table_number}`);
+              }}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Ya
+              </button>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="bg-gray-300 px-3 py-1 rounded"
+              >
+                Batal
+              </button>
+            </div>
+          </span>
+        ),
+        {
+          duration: 10000,
+        }
+      );
+    };
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">

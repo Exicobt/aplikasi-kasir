@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth' // Fungsi verifikasi token Anda
+import { verifyToken } from '@/lib/auth' 
 
 export async function middleware(request) {
   const tokenCookie = await request.cookies.get('token')
@@ -7,7 +7,7 @@ export async function middleware(request) {
 
   const { pathname } = request.nextUrl
 
-  const protectedRoutes = ['/admin', '/kasir', '/dapur']
+  const protectedRoutes = ['/dashboard', '/kasir', '/dapur']
 
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
     if (!token) {
@@ -18,7 +18,7 @@ export async function middleware(request) {
       const decoded = await verifyToken(token)
       const userRole = decoded.role
 
-      if (pathname.startsWith('/admin') && userRole !== 'admin') {
+      if (pathname.startsWith('/dashboard') && userRole !== 'admin') {
         return NextResponse.redirect(new URL('/unauthorized', request.url))
       }
 
@@ -47,7 +47,7 @@ export async function middleware(request) {
   if (pathname === '/' && token) {
     try {
       const decoded = await verifyToken(token)
-      return NextResponse.redirect(new URL(`/${decoded.role}`, request.url))
+      return NextResponse.redirect(new URL(`/${decoded.role === 'admin' ? 'dashboard' : decoded.role}`, request.url))
     } catch {
       return NextResponse.next()
     }
@@ -59,13 +59,7 @@ export async function middleware(request) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|images|$).*)'
+    '/', // Tambahin ini biar halaman '/' ikut dimiddleware-in
+    '/((?!_next/static|_next/image|favicon.ico|images).*)'
   ]
 }

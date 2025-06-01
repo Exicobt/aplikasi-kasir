@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, User, CreditCard, Utensils } from "lucide-react";
@@ -59,7 +60,7 @@ export default function LoginPage() {
         throw new Error(data.error || "Login gagal. Silakan coba lagi.");
       }
       
-      if (role === "admin") router.push("/admin/dashboard");
+      if (role === "admin") router.push("/dashboard");
       if (role === "kasir") router.push("/kasir");
       if (role === "dapur") router.push("/dapur");
       
@@ -75,13 +76,11 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Header */}
           <div className="bg-highlight py-6 px-8 text-center">
-            <h1 className="text-2xl font-bold text-white">Sistem POS Restoran</h1>
+            <h1 className="text-2xl font-bold text-white">Kampus Kuphi</h1>
             <p className="text-indigo-100 mt-1">Silakan masuk ke akun Anda</p>
           </div>
 
-          {/* Role Selector */}
           <div className="flex border-b">
             {["admin", "kasir", "dapur"].map((r) => (
               <button

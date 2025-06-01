@@ -6,45 +6,32 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 model Admin_account {
   id            Int                 @id @default(autoincrement())
   username      String?             @db.VarChar(100)
   password      String?             @db.VarChar(100)
   full_name     String?             @db.VarChar(100)
   role          admin_account_role? @default(kasir)
-  orders        Orders[]
   website_order Website_order[]
+  orders        Orders[]            @relation("Admin_accountToOrders")
 
   @@map("admin_account")
 }
 
 model Basket {
-  id            Int         @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   order_type_id Int?
-  order_type    Order_type? @relation(fields: [order_type_id], references: [id])
+  create_at     DateTime       @default(now()) @db.Timestamp(0)
+  customers_id  Int?
+  status        kitchen_status @default(waiting)
+  customers     Customers?     @relation(fields: [customers_id], references: [id])
+  order_type    Order_type?    @relation(fields: [order_type_id], references: [id])
   orders        Orders[]
-  
+
   @@index([order_type_id])
+  @@index([customers_id])
   @@map("basket")
 }
-
-model Drinks {
-  id    Int      @id @default(autoincrement())
-  name  String?  @db.VarChar(100)
-  price Decimal? @db.Decimal(10, 2)
-
-  @@map("drinks")
-}
-
-model Foods {
-  id    Int      @id @default(autoincrement())
-  name  String?  @db.VarChar(100)
-  price Decimal? @db.Decimal(10, 2)
-
-  @@map("foods")
-}
-
 model Kitchen {
   id         Int             @id @default(autoincrement())
   order_id   Int
@@ -57,28 +44,50 @@ model Kitchen {
 }
 
 model Order_type {
-  id      Int     @id @default(autoincrement())
+  id      Int      @id @default(autoincrement())
   name    String
   baskets Basket[]
-  
+
   @@map("order_type")
 }
 
 model Orders {
-  id       Int    @id @default(autoincrement())
-  basket_id Int?
-  menu_id   Int?
-  qty      Int
-  total    Int
-  basket   Basket? @relation(fields: [basket_id], references: [id])
-  menu     Menu?   @relation(fields: [menu_id], references: [id])
-  
+  id            Int             @id @default(autoincrement())
+  basket_id     Int?
+  menu_id       Int?
+  qty           Int
+  total         Int
+  Kitchen       Kitchen[]
+  basket        Basket?         @relation(fields: [basket_id], references: [id])
+  menu          Menu?           @relation(fields: [menu_id], references: [id])
+  Website_order Website_order[]
+  Admin_account Admin_account[] @relation("Admin_accountToOrders")
+
   @@index([basket_id])
   @@index([menu_id])
   @@map("orders")
-  Kitchen Kitchen[] @relation(map: "kitchen_order_fk")
-  Admin_account Admin_account[]
-  Website_order Website_order[] @relation(map: "website_order_ibfk_1")
+}
+
+model Customers {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  create_at DateTime @default(now()) @db.Timestamp(0)
+  table_id  Int?
+  basket    Basket[]
+  table     Table?   @relation(fields: [table_id], references: [id])
+
+  @@index([table_id], map: "customers_table_id_fkey")
+  @@map("customers")
+}
+
+model Table {
+  id           Int            @id @default(autoincrement())
+  table_number String            @unique
+  status       table_status?  @default(available)
+  location     table_location
+  customers    Customers[]
+
+  @@map("table")
 }
 
 model Website_order {
@@ -99,31 +108,31 @@ model Website_order {
 }
 
 model Menu {
-  id       Int     @id @default(autoincrement())
-  nama     String
-  harga    Int
-  kategori String
-  orders   Orders[]
-  
+  id            Int             @id @default(autoincrement())
+  nama          String
+  kategori      menu_kategori
+  harga         Int
+  gambar        String          @db.LongText
+  orders        Orders[]
+  Website_order Website_order[]
+  menu_stats    Menu_stats[]
+
   @@map("menu")
-  Website_order Website_order[] @relation(map: "fk_menu_id")
 }
 
-model snacks {
-  id    Int      @id @default(autoincrement())
-  name  String?  @db.VarChar(100)
-  price Decimal? @db.Decimal(10, 2)
-}
+model Menu_stats {
+  menu_id         Int           @id
+  quantity        Int
+  menu            Menu?         @relation(fields: [menu_id], references: [id])
 
-enum order_type_type_name {
-  take_away
-  dine_in
+  @@map("menu_stats")
 }
 
 enum kitchen_status {
   waiting
   preparing
   done
+  finish
 }
 
 enum admin_account_role {
@@ -136,4 +145,15 @@ enum menu_kategori {
   foods
   drinks
   snacks
+}
+
+enum table_status {
+  available
+  occupied
+  not_available
+}
+
+enum table_location {
+  lantai_1 @map("lantai 1")
+  lantai_2 @map("lantai 2")
 }

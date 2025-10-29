@@ -1,37 +1,29 @@
-## 1. Clone repo 
+# 💻 Aplikasi Kasir – Next.js + Prisma + MySQL
+
+Proyek ini adalah aplikasi kasir berbasis **Next.js** yang menggunakan **Prisma ORM** untuk mengelola database **MySQL**.  
+Aplikasi ini dirancang untuk membantu pengelolaan transaksi, data menu, dan manajemen keuangan secara efisien dengan tampilan modern dan responsif.
+
+---
+
+## 🚀 Fitur Utama
+
+- CRUD data menu dan transaksi 💰  
+- Manajemen database menggunakan **Prisma ORM**  
+- Autentikasi berbasis **JWT Token**  
+- Database **MySQL**  
+- Tampilan responsif berbasis **Next.js 13+**
+
+---
+
+## ⚙️ Langkah Instalasi
+
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lokal kamu:
+
+---
+
+### 🧩 1. Clone Repository
+Clone repository ini dan masuk ke folder proyek:
+
 ```bash
 git clone https://github.com/Exicobt/aplikasi-kasir.git
 cd aplikasi-kasir
-
-## 2. Install dependensi
-```bash
-npm install
-
-## 3. Buat file .env
-Buat file ```.env``` di root folder dan isi:
-```bash
-DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/NAMA_DATABASE"
-Ubah user, password, dan nama database yang sesuai
-
-## 4. Buat file .env.local
-Buat file ```.env.local``` di root folder dan isi:
-```bash
-xIrtrCeSrGJy7KJm3ub5Ej2fe1CYU9Pyyk6BhvYsdS0
-
-## 5. Import sql
-Buka folder ```script/db_warkop.sql```
-Kemudian import ke mysql
-
-## 6. Generate prisma client
-```bash
-npx prisma generate
-
-## 7. Jalankan migrasi database
-```bash
-npx prisma migrate dev --name init
-
-## 8. Jalankan program
-```bash
-npm run dev
-Lalu buka http://localhost:3000
-

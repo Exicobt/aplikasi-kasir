@@ -70,8 +70,3 @@ Lalu buka di browser:
 
 ---
 
-
-
-
-
-Dibuat dengan ❤️ menggunakan **Next.js + Prisma + MySQL**
